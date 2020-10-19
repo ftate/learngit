@@ -97,11 +97,127 @@ Initialized empty Git repository in /c/ProgramTemp/git/.git/
 
 瞬间Git就把仓库建好了，而且告诉你是一个空的仓库（empty Git repository），可以发现当前目录下多了一个`.git`的目录，这个目录是Git来跟踪管理版本库的，没事千万不要手动修改这个目录里面的文件，不然改乱了，就把Git仓库给破坏了。
 
-### 把文件添加到版本库
+#### 把文件添加到版本库
 
-将正在编写的`typora`文件夹加入到版本库中
+言归正传，现在我们编写一个`readme.txt`文件，内容如下
+
+```java
+Git is a version control system.
+Git is free software.
+```
 
 一定要放到`git`目录下（子目录也行），因为这是一个Git仓库，放到其他地方Git再厉害也找不到这个文件。
 
 第一步，用命令`git add`告诉Git，把文件添加到仓库：
 
+```java
+$ git add readme.txt
+```
+
+执行上面的命令，没有任何显示，这就对了，Unix的哲学是“没有消息就是好消息”，说明添加成功。
+
+第二步，用命令`git commit`告诉Git，把文件提交到仓库：
+
+```java
+$ git commit -m "wrote a readme file"
+[master (root-commit) eaadf4e] wrote a readme file
+ 1 file changed, 2 insertions(+)
+ create mode 100644 readme.txt
+```
+
+简单解释一下`git commit`命令，`-m`后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录。
+
+`git commit`命令执行成功后会告诉你，`1 file changed`：1个文件被改动（我们新添加的readme.txt文件）；`2 insertions`：插入了两行内容（readme.txt有两行内容）。
+
+为什么Git添加文件需要`add`，`commit`一共两步呢？因为`commit`可以一次提交很多文件，所以你可以多次`add`不同的文件，比如：
+
+```java
+$ git add file1.txt
+$ git add file2.txt file3.txt
+$ git commit -m "add 3 files."
+```
+
+ 小结
+
+初始化一个Git仓库，使用`git init`命令。
+
+添加文件到Git仓库，分两步：
+
+1. 使用命令`git add <file>`，注意，可反复多次使用，添加多个文件；
+2. 使用命令`git commit -m <message>`，完成。
+
+### 时光穿梭机
+
+我们已经成功地添加并提交了一个readme.txt文件，现在，是时候继续工作了，于是，我们继续修改readme.txt文件，改成如下内容：
+
+```java
+Git is a distributed version control system.
+Git is free software.
+```
+
+现在，运行`git status`命令看看结果：
+
+```
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+`git status`命令可以让我们时刻掌握仓库当前的状态，上面的命令输出告诉我们，`readme.txt`被修改过了，但还没有准备提交的修改。
+
+虽然Git告诉我们`readme.txt`被修改了，但如果能看看具体修改了什么内容，自然是很好的。比如你休假两周从国外回来，第一天上班时，已经记不清上次怎么修改的`readme.txt`，所以，需要用`git diff`这个命令看看：
+
+```
+$ git diff readme.txt 
+diff --git a/readme.txt b/readme.txt
+index 46d49bf..9247db6 100644
+--- a/readme.txt
++++ b/readme.txt
+@@ -1,2 +1,2 @@
+-Git is a version control system.
++Git is a distributed version control system.
+ Git is free software.
+```
+
+`git diff`顾名思义就是查看difference，显示的格式正是Unix通用的diff格式，可以从上面的命令输出看到，我们在第一行添加了一个`distributed`单词。
+
+知道了对`readme.txt`作了什么修改后，再把它提交到仓库就放心多了，提交修改和提交新文件是一样的两步，第一步是`git add`：
+
+```
+$ git add readme.txt
+```
+
+同样没有任何输出。在执行第二步`git commit`之前，我们再运行`git status`看看当前仓库的状态：
+
+```
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   readme.txt
+```
+
+`git status`告诉我们，将要被提交的修改包括`readme.txt`，下一步，就可以放心地提交了：
+
+```
+$ git commit -m "add distributed"
+[master e475afc] add distributed
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+提交后，我们再用`git status`命令看看仓库的当前状态：
+
+```
+$ git status
+On branch master
+nothing to commit, working tree clean
+```
+
+Git告诉我们当前没有需要提交的修改，而且，工作目录是干净（working tree clean）的。
