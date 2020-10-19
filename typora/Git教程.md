@@ -221,3 +221,164 @@ nothing to commit, working tree clean
 ```
 
 Git告诉我们当前没有需要提交的修改，而且，工作目录是干净（working tree clean）的。
+
+#### 版本回退
+
+```
+Git is a distributed version control system.
+Git is free software distributed under the GPL.
+```
+
+然后尝试提交：
+
+```
+$ git add readme.txt
+$ git commit -m "append GPL"
+[master 1094adb] append GPL
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+像这样，你不断对文件进行修改，然后不断提交修改到版本库里，就好比玩RPG游戏时，每通过一关就会自动把游戏状态存盘，如果某一关没过去，你还可以选择读取前一关的状态。有些时候，在打Boss之前，你会手动存盘，以便万一打Boss失败了，可以从最近的地方重新开始。Git也是一样，每当你觉得文件修改到一定程度的时候，就可以“保存一个快照”，这个快照在Git中被称为`commit`。一旦你把文件改乱了，或者误删了文件，还可以从最近的一个`commit`恢复，然后继续工作，而不是把几个月的工作成果全部丢失。
+
+现在，我们回顾一下`readme.txt`文件一共有几个版本被提交到Git仓库里了：
+
+版本1：wrote a readme file
+
+```
+Git is a version control system.
+Git is free software.
+```
+
+版本2：add distributed
+
+```
+Git is a distributed version control system.
+Git is free software.
+```
+
+版本3：append GPL
+
+```
+Git is a distributed version control system.
+Git is free software distributed under the GPL.
+```
+
+当然了，在实际工作中，我们脑子里怎么可能记得一个几千行的文件每次都改了什么内容，不然要版本控制系统干什么。版本控制系统肯定有某个命令可以告诉我们历史记录，在Git中，我们用`git log`命令查看：
+
+```java
+$ git log
+  commit f08e64964b55f3ae91e6876586408ba38f6bbe6c (HEAD -> master)
+Author: 陈飞宇 <ftatevvip@outlook.example.com>
+Date:   Mon Oct 19 11:28:34 2020 +0800
+
+    append GPL
+
+commit 067681e4adaaf0f2824cf2b6ae542e78d09cdcd2
+Author: 陈飞宇 <ftatevvip@outlook.example.com>
+Date:   Mon Oct 19 11:16:32 2020 +0800
+
+    git status | git diff complete
+```
+
+如果嫌输出信息太多，看得眼花缭乱的，可以试试加上`--pretty=oneline`参数
+
+```java
+$ git log --pretty=oneline
+f08e64964b55f3ae91e6876586408ba38f6bbe6c (HEAD -> master) append GPL
+067681e4adaaf0f2824cf2b6ae542e78d09cdcd2 git status | git diff complete
+e85af4b41953f0e47b1c7d585ff06afed9a815d6 Created a typora folder
+9c154d0b6a60a8a6906b3a2956f4dc2a5a8a6686 add distributed
+94ac9ffc584c9d1761ff1264185243881fba5584 wrote a readme file
+```
+
+需要友情提示的是，你看到的一大串类似`1094adb...`的是`commit id`（版本号），和SVN不一样，Git的`commit id`不是1，2，3……递增的数字，而是一个SHA1计算出来的一个非常大的数字，用十六进制表示，而且你看到的`commit id`和我的肯定不一样，以你自己的为准。为什么`commit id`需要用这么一大串数字表示呢？因为Git是分布式的版本控制系统，后面我们还要研究多人在同一个版本库里工作，如果大家都用1，2，3……作为版本号，那肯定就冲突了
+
+好了，现在我们启动时光穿梭机，准备把`readme.txt`回退到上一个版本，也就是`add distributed`的那个版本，怎么做呢？
+
+首先，Git必须知道当前版本是哪个版本，在Git中，用`HEAD`表示当前版本，也就是最新的提交`1094adb...`（注意我的提交ID和你的肯定不一样），上一个版本就是`HEAD^`，上上一个版本就是`HEAD^^`，当然往上100个版本写100个`^`比较容易数不过来，所以写成`HEAD~100`。
+
+现在，我们要把当前版本`append GPL`回退到上一个版本`add distributed`，就可以使用`git reset`命令：
+
+```java
+$ git reset --hard HEAD^
+HEAD is now at git status | git diff complete
+```
+
+果然被还原了。(写版本回退板块会没有)
+
+想要回退只要上面的命令行窗口还没有被关掉，你就可以顺着往上找啊找啊，找到那个`append GPL`的`commit id`是`f08e649...`，于是就可以指定回到未来的某个版本：
+
+```java
+$ git reset --hard 1094a
+HEAD is now at 83b0afe append GPL
+```
+
+版本号没必要写全，前几位就可以了，Git会自动去找。当然也不能只写前一两位，因为Git可能会找到多个版本号，就无法确定是哪一个了。
+
+果然，我胡汉三又回来了。
+
+Git的版本回退速度非常快，因为Git在内部有个指向当前版本的`HEAD`指针，当你回退版本的时候，Git仅仅是把HEAD从指向`append GPL`：
+
+```ascii
+┌────┐
+│HEAD│
+└────┘
+   │
+   └──> ○ append GPL
+        │
+        ○ add distributed
+        │
+        ○ wrote a readme file
+```
+
+改为指向`add distributed`：
+
+```ascii
+┌────┐
+│HEAD│
+└────┘
+   │
+   │    ○ append GPL
+   │    │
+   └──> ○ add distributed
+        │
+        ○ wrote a readme file
+```
+
+然后顺便把工作区的文件更新了。所以你让`HEAD`指向哪个版本号，你就把当前版本定位在哪。
+
+现在，你回退到了某个版本，关掉了电脑，第二天早上就后悔了，想恢复到新版本怎么办？找不到新版本的`commit id`怎么办？
+
+在Git中，总是有后悔药可以吃的。当你用`$ git reset --hard HEAD^`回退到`add distributed`版本时，再想恢复到`append GPL`，就必须找到`append GPL`的commit id。Git提供了一个命令`git reflog`用来记录你的每一次命令：
+
+```java
+$ git reflog
+f08e649 (HEAD -> master) HEAD@{0}: reset: moving to f08e
+067681e HEAD@{1}: reset: moving to HEAD^
+f08e649 (HEAD -> master) HEAD@{2}: commit: append GPL
+067681e HEAD@{3}: commit: git status | git diff complete
+e85af4b HEAD@{4}: commit: Created a typora folder
+9c154d0 HEAD@{5}: commit: add distributed
+94ac9ff HEAD@{6}: commit (initial): wrote a readme file
+```
+
+终于舒了口气，从输出可知，`append GPL`的commit id是`f08e649`，现在，你又可以乘坐时光机回到未来了。
+
+小结
+
+现在总结一下：
+
+- `HEAD`指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令`git reset --hard commit_id`。
+- 穿梭前，用`git log`可以查看提交历史，以便确定要回退到哪个版本。
+- 要重返未来，用`git reflog`查看命令历史，以便确定要回到未来的哪个版本。
+	
+
+#### 工作区和暂存区
+
+Git和其他版本控制系统如SVN的一个不同之处就是有暂存区的概念。
+
+先来看名词解释。
+
+工作区（Working Directory）
+
+就是你在电脑里能看到的目录，比如我的`learngit`文件夹就是一个工作区：
