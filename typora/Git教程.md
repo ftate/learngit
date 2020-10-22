@@ -2376,3 +2376,66 @@ git push gitee master
 ```
 
 Gitee也同样提供了Pull request功能，可以让其他小伙伴参与到开源项目中来。你可以通过Fork我的仓库：[https://gitee.com/liaoxuefeng/learngit](https://gitee.com/liaoxuefeng/learngit?utm_source=blog_lxf)，创建一个`your-gitee-id.txt`的文本文件， 写点自己学习Git的心得，然后推送一个pull request给我，这个仓库会在Gitee和GitHub做双向同步。
+
+## 期末总结
+
+终于到了期末总结的时刻了！
+
+经过几天的学习，相信你对Git已经初步掌握。一开始，可能觉得Git上手比较困难，尤其是已经熟悉SVN的童鞋，没关系，多操练几次，就会越用越顺手。
+
+Git虽然极其强大，命令繁多，但常用的就那么十来个，掌握好这十几个常用命令，你已经可以得心应手地使用Git了。
+
+友情附赠国外网友制作的Git Cheat Sheet，建议打印出来备用：
+
+[Git Cheat Sheet](https://gitee.com/liaoxuefeng/learn-java/raw/master/teach/git-cheatsheet.pdf)
+
+现在告诉你Git的官方网站：[http://git-scm.com](http://git-scm.com/)，英文自我感觉不错的童鞋，可以经常去官网看看。什么，打不开网站？相信我，我给出的绝对是官网地址，而且，Git官网决没有那么容易宕机，可能是你的人品问题，赶紧面壁思过，好好想想原因。
+
+如果你学了Git后，工作效率大增，有更多的空闲时间健身看电影，那我的教学目标就达到了。
+
+谢谢观看！
+
+## Git常用指令
+
+```
+$ mkdir 创建文件
+$ pwd 显示当前目录
+$ ls 显示当前所有文件
+$ git init 把这个目录变成Git可以管理的仓库
+把一个文件放到Git仓库只需要两步。
+$ git add 文件名 
+$ git commit -m"写描述" 
+$ git status 掌握仓库当前的状态
+$ git diff 文件名  顾名思义就是查看differenc(可以查看修改内容。)
+$ git log 可以查看提交历史，以便确定要回退到哪个版本。
+$ git log --pretty=oneline
+$ git reset --hard HEAD^ 回退到上一个版本
+$ git reset --hard 版本号
+$ git reflog 查看命令历史，以便确定要回到未来的哪个版本。
+git diff HEAD -- 文件名 可以查看工作区和版本库里面最新版本的区别
+$ git checkout -- 文件名 当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时
+$ git reset HEAD 文件名 可以把暂存区的修改撤销掉（unstage），重新放回工作区：
+$ rm 文件名 删文件
+$ rm -rf 文件名 删除文件夹   -r 递归 -f强制
+$ git rm 文件名 删版本库里面的文件
+$ git checkout -- 文件名 另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：
+$ git remote add github git@github.com:ftate/learngit.git 本地关联远程仓库
+$ git push -u github master 第一次推送master分支时, 上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。
+$ git push github master 本地库的所有内容推送到远程库上
+$ git clone SSH 克隆仓库
+$ git checkout -b dev 创建dev分支，然后切换到dev分支：
+$ git branch 查看当前分支：
+git branch <name> 创建分支
+$ git checkout master 切换回master分支：
+$ git merge dev  dev分支的工作成果合并到master分支上：
+$ git branch -d dev 删除dev分支
+新(好用)
+$ git switch -c dev 创建并切换到新的dev分支
+$ git switch master 直接切换到已有的master分支
+$ git merge --no-ff -m "描述" dev   分支历史上就可以看出分支信息。
+$ git stash 可以把当前工作区“储藏”起来
+git stash list 查看工作现场位置
+git stash pop 恢复的同时把stash里内容也删了
+$ git branch -D 文件名 强制删除分支
+
+```
