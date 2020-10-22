@@ -418,15 +418,14 @@ $ git status
 On branch master
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
-  (use "git restore <file>..." to discard changes in working directory)
-        modified:   readme.txt
-        modified:   "typora/Git\346\225\231\347\250\213.md"
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
-        license.txt
-        "typora/Git\346\225\231\347\250\213.assets/0.png"
-        "typora/Git\346\225\231\347\250\213.assets/QQ\345\233\276\347\211\20720201019133742.png"
+
+	LICENSE
 
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
@@ -439,20 +438,10 @@ Git非常清楚地告诉我们，`readme.txt`被修改了，而`LICENSE`还从�
 $ git status
 On branch master
 Changes to be committed:
-  (use "git restore --staged <file>..." to unstage)
-        new file:   license.txt
-        modified:   readme.txt
+  (use "git reset HEAD <file>..." to unstage)
 
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-  (use "git restore <file>..." to discard changes in working directory)
-        modified:   "typora/Git\346\225\231\347\250\213.md"
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        "typora/Git\346\225\231\347\250\213.assets/0.png"
-        "typora/Git\346\225\231\347\250\213.assets/QQ\345\233\276\347\211\20720201019133742.png"
-
+	new file:   LICENSE
+	modified:   readme.txt
 ```
 
 现在，暂存区的状态就变成这样了：
@@ -964,3 +953,86 @@ README.md
 要克隆一个仓库，首先必须知道仓库的地址，然后使用`git clone`命令克隆。
 
 Git支持多种协议，包括`https`，但`ssh`协议速度最快。
+
+## 分支管理
+
+分支就是科幻电影里面的平行宇宙，当你正在电脑前努力学习Git的时候，另一个你正在另一个平行宇宙里努力学习SVN。
+
+如果两个平行宇宙互不干扰，那对现在的你也没啥影响。不过，在某个时间点，两个平行宇宙合并了，结果，你既学会了Git又学会了SVN！
+
+![learn-branches](https://www.liaoxuefeng.com/files/attachments/919021987875136/0)
+
+分支在实际中有什么用呢？假设你准备开发一个新功能，但是需要两周才能完成，第一周你写了50%的代码，如果立刻提交，由于代码还没写完，不完整的代码库会导致别人不能干活了。如果等代码全部写完再一次提交，又存在丢失每天进度的巨大风险。
+
+现在有了分支，就不用怕了。你创建了一个属于你自己的分支，别人看不到，还继续在原来的分支上正常工作，而你在自己的分支上干活，想提交就提交，直到开发完毕后，再一次性合并到原来的分支上，这样，既安全，又不影响别人工作。
+
+其他版本控制系统如SVN等都有分支管理，但是用过之后你会发现，这些版本控制系统创建和切换分支比蜗牛还慢，简直让人无法忍受，结果分支功能成了摆设，大家都不去用。
+
+但Git的分支是与众不同的，无论创建、切换和删除分支，Git在1秒钟之内就能完成！无论你的版本库是1个文件还是1万个文件。
+
+### 创建与合并分支
+
+在[版本回退](https://www.liaoxuefeng.com/wiki/896043488029600/897013573512192)里，你已经知道，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即`master`分支。`HEAD`严格来说不是指向提交，而是指向`master`，`master`才是指向提交的，所以，`HEAD`指向的就是当前分支。
+
+一开始的时候，`master`分支是一条线，Git用`master`指向最新的提交，再用`HEAD`指向`master`，就能确定当前分支，以及当前分支的提交点：
+
+![Snipaste_2020-10-22_13-36-19](Git教程.assets/Snipaste_2020-10-22_13-36-19.png)
+
+每次提交，`master`分支都会向前移动一步，这样，随着你不断提交，`master`分支的线也越来越长。
+
+当我们创建新的分支，例如`dev`时，Git新建了一个指针叫`dev`，指向`master`相同的提交，再把`HEAD`指向`dev`，就表示当前分支在`dev`上：
+
+![Snipaste_2020-10-22_13-42-32](Git教程.assets/Snipaste_2020-10-22_13-42-32.png)
+
+你看，Git创建一个分支很快，因为除了增加一个`dev`指针，改改`HEAD`的指向，工作区的文件都没有任何变化！
+
+不过，从现在开始，对工作区的修改和提交就是针对`dev`分支了，比如新提交一次后，`dev`指针往前移动一步，而`master`指针不变：
+
+![Snipaste_2020-10-22_13-36-28](Git教程.assets/Snipaste_2020-10-22_13-36-28.png)
+
+假如我们在`dev`上的工作完成了，就可以把`dev`合并到`master`上。Git怎么合并呢？最简单的方法，就是直接把`master`指向`dev`的当前提交，就完成了合并：
+
+![Snipaste_2020-10-22_13-36-43](Git教程.assets/Snipaste_2020-10-22_13-36-43.png)
+
+所以Git合并分支也很快！就改改指针，工作区内容也不变！
+
+合并完分支后，甚至可以删除`dev`分支。删除`dev`分支就是把`dev`指针给删掉，删掉后，我们就剩下了一条`master`分支：
+
+![Snipaste_2020-10-22_13-36-49](Git教程.assets/Snipaste_2020-10-22_13-36-49.png)
+
+真是太神奇了，你看得出来有些提交是通过分支完成的吗？
+
+下面开始实战。
+
+首先，我们创建`dev`分支，然后切换到`dev`分支：
+
+首先，我们创建`dev`分支，然后切换到`dev`分支：
+
+```
+$ git checkout -b dev
+Switched to a new branch 'dev'
+```
+
+`git checkout`命令加上`-b`参数表示创建并切换，相当于以下两条命令：
+
+```
+$ git branch dev
+$ git checkout dev
+Switched to branch 'dev'
+```
+
+然后，用`git branch`命令查看当前分支：
+
+```
+$ git branch
+* dev
+  master
+```
+
+`git branch`命令会列出所有分支，当前分支前面会标一个`*`号。
+
+然后，我们就可以在`dev`分支上正常提交，比如对`readme.txt`做个修改，加上一行：
+
+```
+Creating a new branch is quick.
+```
